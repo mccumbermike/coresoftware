@@ -335,179 +335,202 @@ namespace FitNewton
     min_point = (*current_point);
     function=orig_func;return converged;
   }
-  
-  
-  bool NewtonMinimizerGradHessian::minimize(const VectorXd& start_point, VectorXd& min_point, double tol, unsigned int max_iter, double abs_tol)
-  {
-    try
-    {
-      if(!function){throw (char*)("minimize called but function has not been set");}
-    }
-    catch(char* str)
-    {
-      cout<<"Exception from NewtonMinimizerGradHessian: "<<str<<endl;
+
+  bool NewtonMinimizerGradHessian::minimize(const VectorXd& start_point,
+                                            VectorXd& min_point, MatrixXd& min_point_covar,
+					    double tol,
+                                            unsigned int max_iter,
+                                            double abs_tol) {
+    try {
+      if (!function) {
+        throw(char*)("minimize called but function has not been set");
+      }
+    } catch (char* str) {
+      cout << "Exception from NewtonMinimizerGradHessian: " << str << endl;
       throw;
       return false;
     }
-    
+
     unsigned int npars = function->nPars();
-    
-    try
-    {
-      if(!(npars>0)){throw (char*)("function to be minimized has zero dimensions");}
-      if(start_point.rows()!=(int)npars){throw (char*)("input to minimizer not of dimension required by function to be minimized");}
-    }
-    catch(char* str)
-    {
-      cout<<"Exception from NewtonMinimizerGradHessian: "<<str<<endl;
+
+    try {
+      if (!(npars > 0)) {
+        throw(char*)("function to be minimized has zero dimensions");
+      }
+      if (start_point.rows() != (int)npars) {
+        throw(char*)(
+            "input to minimizer not of dimension required by function to be "
+            "minimized");
+      }
+    } catch (char* str) {
+      cout << "Exception from NewtonMinimizerGradHessian: " << str << endl;
       throw;
       return false;
     }
-    
-    
-    //parameters used for the Wolfe conditions
+
+    // parameters used for the Wolfe conditions
     double c1 = 1.0e-4;
     double c2 = 0.9;
-    
-    
+
     VectorXd working_points[2];
     working_points[0] = VectorXd::Zero(npars);
     working_points[1] = VectorXd::Zero(npars);
-    
+
     VectorXd* current_point = &(working_points[0]);
     VectorXd* try_point = &(working_points[1]);
-    
+
     (*current_point) = start_point;
-    
-    double value=0.;
-    double prev_value=0.;
-    
-    double dir_der=0.;
+
+    double value = 0.;
+    double prev_value = 0.;
+
+    double dir_der = 0.;
     double scale = 1.;
     double scale_temp = 1.;
     double grad0_dir = 0.;
-    
+
     bool good_value = true;
     bool bounds = true;
-    
+
     unsigned int search_iter = 32;
-    
+
     VectorXd grad[2];
     grad[0] = VectorXd::Zero(npars);
     grad[1] = VectorXd::Zero(npars);
     VectorXd* current_grad = &(grad[0]);
     VectorXd* try_grad = &(grad[1]);
-    
-    
+
     MatrixXd hessian = MatrixXd::Zero(npars, npars);
-    
+
     VectorXd move = VectorXd::Zero(npars);
     VectorXd unit_move = VectorXd::Zero(npars);
-    
-    //try a Newton iteration
-    function->calcValGradHessian((*current_point), value, (*current_grad), hessian);
-    for(unsigned int i=0;i<fixparameter.size();++i)
-    {
-      if(fixparameter[i] != 0)
-      {
+
+    // try a Newton iteration
+    function->calcValGradHessian((*current_point), value, (*current_grad),
+                                 hessian);
+    for (unsigned int i = 0; i < fixparameter.size(); ++i) {
+      if (fixparameter[i] != 0) {
         (*current_grad)[i] = 0.;
-        for(unsigned int j=0;j<npars;++j)
-        {
-          hessian(j,i) = 0.;
-          hessian(i,j) = 0.;
+        for (unsigned int j = 0; j < npars; ++j) {
+          hessian(j, i) = 0.;
+          hessian(i, j) = 0.;
         }
-        hessian(i,i) = 1.;
+        hessian(i, i) = 1.;
       }
     }
-    
+
     move = -hessian.fullPivLu().solve(*current_grad);
-    good_value=true;
-    for(unsigned int i=0;i<npars;++i){if(!(move(i) == move(i))){good_value=false;break;}}
-    if(good_value == false){move = - (*current_grad);}
+    good_value = true;
+    for (unsigned int i = 0; i < npars; ++i) {
+      if (!(move(i) == move(i))) {
+        good_value = false;
+        break;
+      }
+    }
+    if (good_value == false) {
+      move = -(*current_grad);
+    }
     dir_der = (*current_grad).dot(move);
-    //if the inverse hessian times the negative gradient isn't even a descent direction, negate the direction
-    if(dir_der>0.)
-    {
+    // if the inverse hessian times the negative gradient isn't even a descent
+    // direction, negate the direction
+    if (dir_der > 0.) {
       move = -move;
     }
     function->rescaleMove((*current_point), move);
     grad0_dir = (*current_grad).dot(move);
     scale_temp = 1.;
-    //find scale, such that move*scale satisfies the strong Wolfe conditions
-    bounds = lineSearch(scale_temp, c1, c2, (*try_grad), move, grad0_dir, value, (*current_point), (*try_point), tol, abs_tol, search_iter, scale);
-    if(bounds == false){min_point = start_point; return false;}
+    // find scale, such that move*scale satisfies the strong Wolfe conditions
+    bounds = lineSearch(scale_temp, c1, c2, (*try_grad), move, grad0_dir, value,
+                        (*current_point), (*try_point), tol, abs_tol,
+                        search_iter, scale);
+    if (bounds == false) {
+      min_point = start_point;
+      return false;
+    }
     move *= scale;
     (*try_point) = ((*current_point) + move);
-    function->calcValGradHessian((*try_point), prev_value, (*try_grad), hessian);
-    for(unsigned int i=0;i<fixparameter.size();++i)
-    {
-      if(fixparameter[i] != 0)
-      {
+    function->calcValGradHessian((*try_point), prev_value, (*try_grad),
+                                 hessian);
+    for (unsigned int i = 0; i < fixparameter.size(); ++i) {
+      if (fixparameter[i] != 0) {
         (*try_grad)[i] = 0.;
-        for(unsigned int j=0;j<npars;++j)
-        {
-          hessian(j,i) = 0.;
-          hessian(i,j) = 0.;
+        for (unsigned int j = 0; j < npars; ++j) {
+          hessian(j, i) = 0.;
+          hessian(i, j) = 0.;
         }
-        hessian(i,i) = 1.;
+        hessian(i, i) = 1.;
       }
     }
     swap(current_point, try_point);
     swap(current_grad, try_grad);
     swap(value, prev_value);
-    
+
     unsigned long int count = 1;
-    bool converged=false;
-    while(converged==false)
-    {
-      if((fabs((prev_value - value)/prev_value)<tol || fabs(prev_value - value)<abs_tol)){converged=true;break;}
+    bool converged = false;
+    while (converged == false) {
+      if ((fabs((prev_value - value) / prev_value) < tol ||
+           fabs(prev_value - value) < abs_tol)) {
+        converged = true;
+        break;
+      }
       prev_value = value;
-      //try a Newton iteration
-      
+      // try a Newton iteration
+
       move = -hessian.fullPivLu().solve(*current_grad);
-      good_value=true;
-      for(unsigned int i=0;i<npars;++i){if(!(move(i) == move(i))){good_value=false;break;}}
-      if(good_value == false){move = - (*current_grad);}
+      good_value = true;
+      for (unsigned int i = 0; i < npars; ++i) {
+        if (!(move(i) == move(i))) {
+          good_value = false;
+          break;
+        }
+      }
+      if (good_value == false) {
+        move = -(*current_grad);
+      }
       dir_der = (*current_grad).dot(move);
-      //if the inverse hessian times the negative gradient isn't even a descent direction, negate the direction
-      if(dir_der>0.)
-      {
+      // if the inverse hessian times the negative gradient isn't even a descent
+      // direction, negate the direction
+      if (dir_der > 0.) {
         move = -move;
       }
       function->rescaleMove((*current_point), move);
       grad0_dir = (*current_grad).dot(move);
       scale_temp = 1.;
-      //find scale, such that move*scale satisfies the strong Wolfe conditions
-//       scale_temp = fabs(value/grad0_dir);
-      bounds = lineSearch(scale_temp, c1, c2, (*try_grad), move, grad0_dir, value, (*current_point), (*try_point), tol, abs_tol, search_iter, scale);
-      if(bounds == false){min_point = (*current_point); return false;}
+      // find scale, such that move*scale satisfies the strong Wolfe conditions
+      //       scale_temp = fabs(value/grad0_dir);
+      bounds = lineSearch(scale_temp, c1, c2, (*try_grad), move, grad0_dir,
+                          value, (*current_point), (*try_point), tol, abs_tol,
+                          search_iter, scale);
+      if (bounds == false) {
+        min_point = (*current_point);
+        return false;
+      }
       move *= scale;
       (*try_point) = ((*current_point) + move);
       function->calcValGradHessian((*try_point), value, (*try_grad), hessian);
-      for(unsigned int i=0;i<fixparameter.size();++i)
-      {
-        if(fixparameter[i] != 0)
-        {
+      for (unsigned int i = 0; i < fixparameter.size(); ++i) {
+        if (fixparameter[i] != 0) {
           (*try_grad)[i] = 0.;
-          for(unsigned int j=0;j<npars;++j)
-          {
-            hessian(j,i) = 0.;
-            hessian(i,j) = 0.;
+          for (unsigned int j = 0; j < npars; ++j) {
+            hessian(j, i) = 0.;
+            hessian(i, j) = 0.;
           }
-          hessian(i,i) = 1.;
+          hessian(i, i) = 1.;
         }
       }
       swap(current_point, try_point);
       swap(current_grad, try_grad);
-      
+
       count++;
-      if(count > max_iter){break;}
+      if (count > max_iter) {
+        break;
+      }
     }
     function->computeCovariance(value, hessian);
-    
+
     min_point = (*current_point);
+    min_point_covar = hessian.inverse();
+
     return converged;
   }
 }
-
-

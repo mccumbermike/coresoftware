@@ -223,7 +223,8 @@ public:
   std::vector<SimpleHit3D> _clusters_init; ///< working array of clusters                                                    
   std::vector<SimpleHit3D> _clusters;
   std::vector<SimpleTrack3D> _tracks; ///< working array of tracks                                                      
-  std::vector<float> _vertex;         ///< working array for collision vertex                                           
+  std::vector<float> _vertex;         ///< working array for collision vertex
+  std::vector<std::vector<float> > _vertex_covars;
 
   // track finding routines                                                                                             
   sPHENIXTrackerTPC *_tracker;    // finds full tracks  

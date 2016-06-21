@@ -411,8 +411,14 @@ int PHG4HoughTransform::process_event(PHCompositeNode *topNode) {
   _clusters.clear();
   _tracks.clear();
   _track_errors.clear();
+  _track_covars.clear();
   _vertex.clear();
   _vertex.assign(3,0.0);
+  _vertex_covars.clear();
+  for (unsigned int i=0; i<3; ++i) {
+    _vertex_covars.push_back(std::vector<float>());
+    _vertex_covars[i].assign(3,0.0);
+  }
   
   //-----------------------------------
   // Get Objects off of the Node Tree
@@ -964,9 +970,9 @@ int PHG4HoughTransform::fast_vertex_guessing() {
     }
       
     // start with the average position and converge from there
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 3.00, true);
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.10, true);
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.02, true);
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 3.00, true);
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.10, true);
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.02, true);
   }
 
   // we don't need the tracks anymore
@@ -1045,9 +1051,9 @@ int PHG4HoughTransform::initial_vertex_finding() {
     }
       
     // start with the average position and converge from there
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 3.00, true  );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.10, true  );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.02, false );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 3.00, true  );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.10, true  );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.02, false );
   }
 
   // don't need the tracks anymore
@@ -1387,10 +1393,10 @@ int PHG4HoughTransform::full_tracking_and_vertexing() {
 	   << _vertex[2] - shift_dz << endl;
     }
   
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.300, false );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.100, false );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.020, false );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, 0.005, false );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.300, false );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.100, false );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.020, false );
+    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.005, false );
   
     if (verbosity > 0) {
       cout << " final vertex post-fit: "
@@ -1446,16 +1452,12 @@ int PHG4HoughTransform::export_output() {
   vertex.set_t0(0.0);
   for (int i=0;i<3;++i) vertex.set_position(i,_vertex[i]);
   vertex.set_chisq(0.0);
-  vertex.set_ndof(0); 
-  vertex.set_error(0,0,0.0);
-  vertex.set_error(0,1,0.0);
-  vertex.set_error(0,2,0.0);
-  vertex.set_error(1,0,0.0);
-  vertex.set_error(1,1,0.0);
-  vertex.set_error(1,2,0.0);
-  vertex.set_error(2,0,0.0);
-  vertex.set_error(2,1,0.0);
-  vertex.set_error(2,2,0.0);
+  vertex.set_ndof(0);
+  for (unsigned int i = 0; i < 3; ++i) {
+      for (unsigned int j = 0; j < 3; ++j) {
+	vertex.set_error(i,j,_vertex_covars[i][j]);
+      }
+  }
 
   // at this point we should already have an initial pt and pz guess...
   // need to translate this into the PHG4Track object...
@@ -1559,6 +1561,8 @@ int PHG4HoughTransform::export_output() {
   SvtxVertex *vtxptr = _g4vertexes->insert(&vertex);
   if (verbosity > 5) vtxptr->identify();
 
+  vtxptr->identify();
+  
   if (verbosity > 0) {
     cout << "PHG4HoughTransform::process_event -- leaving process_event"
          << endl;
@@ -1566,11 +1570,17 @@ int PHG4HoughTransform::export_output() {
 
   // we are done with these now...
   _clusters.clear();
+  _clusters.clear();
   _tracks.clear();
   _track_errors.clear();
   _track_covars.clear();
   _vertex.clear();
   _vertex.assign(3,0.0);
+  _vertex_covars.clear();
+  for (unsigned int i=0; i<3; ++i) {
+    _vertex_covars.push_back(std::vector<float>());
+    _vertex_covars[i].assign(3,0.0);
+  }
   
   return Fun4AllReturnCodes::EVENT_OK;
 }

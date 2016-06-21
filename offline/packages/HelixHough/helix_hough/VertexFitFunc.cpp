@@ -315,8 +315,9 @@ bool VertexFitFunc::calcValGradHessian(const VectorXd& x, double& val, VectorXd&
     helixfunc.setFixedPar(7, x(2));
     VectorXd start_point = VectorXd::Zero(1);
     VectorXd min_point = VectorXd::Zero(1);
+    MatrixXd min_point_covar = MatrixXd::Zero(1,1);
     //find the point on the helix closest to the point x
-    minimizer.minimize(start_point, min_point, 0x1.0p-30, 16, 0x1.0p-40);
+    minimizer.minimize(start_point, min_point, min_point_covar, 0x1.0p-30, 16, 0x1.0p-40);
     
     //now calculate the chi-square contribution from this track
     double tval=0.;

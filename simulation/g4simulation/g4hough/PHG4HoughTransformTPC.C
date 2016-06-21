@@ -527,6 +527,12 @@ int PHG4HoughTransformTPC::process_event(PHCompositeNode *topNode)
   _vertex.push_back(0.0); // y guess
   _vertex.push_back(0.0); // z guess
 
+  _vertex_covars.clear();
+  for (unsigned int i=0; i<3; ++i) {
+    _vertex_covars.push_back(std::vector<float>());
+    _vertex_covars[i].assign(3,0.0);
+  }
+  
   //  if(_use_vertex) {
   fast_vertex_from_bbc();            
   //}  // if(_use_vertex)
@@ -651,10 +657,10 @@ int PHG4HoughTransformTPC::process_event(PHCompositeNode *topNode)
   _vertex[1] = 0.;
   _vertex[2] = 0.;
   
-  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, 0.3, false);
-  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, 0.1, false);
-  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, 0.02, false);
-  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, 0.005, false);
+  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, _vertex_covars, 0.3, false);
+  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, _vertex_covars, 0.1, false);
+  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, _vertex_covars, 0.02, false);
+  _vertexFinder.findVertex(vtxtracks, vtxcovariances, _vertex, _vertex_covars, 0.005, false);
   
   _vertex[0] += vx;
   _vertex[1] += vy;
@@ -679,15 +685,11 @@ int PHG4HoughTransformTPC::process_event(PHCompositeNode *topNode)
   for (int i=0;i<3;++i) vertex.set_position(i,_vertex[i]);
   vertex.set_chisq(0.0);
   vertex.set_ndof(0); 
-  vertex.set_error(0,0,0.0);
-  vertex.set_error(0,1,0.0);
-  vertex.set_error(0,2,0.0);
-  vertex.set_error(1,0,0.0);
-  vertex.set_error(1,1,0.0);
-  vertex.set_error(1,2,0.0);
-  vertex.set_error(2,0,0.0);
-  vertex.set_error(2,1,0.0);
-  vertex.set_error(2,2,0.0);
+  for (unsigned int i = 0; i < 3; ++i) {
+      for (unsigned int j = 0; j < 3; ++j) {
+	vertex.set_error(i,j,_vertex_covars[i][j]);
+      }
+  }
   
   // copy out the reconstructed vertex position
   //_g4tracks->setVertex(_vertex[0],_vertex[1],_vertex[2]);
@@ -815,6 +817,8 @@ int PHG4HoughTransformTPC::process_event(PHCompositeNode *topNode)
 
   SvtxVertex *vtxptr = _g4vertexes->insert(&vertex);
   if (verbosity > 5) vtxptr->identify();
+
+   vtxptr->identify();
   
   if(verbosity > 0)
   {

@@ -281,7 +281,8 @@ private:
   std::vector<double> _track_errors;     ///< working array of track chisq
   std::vector<Eigen::Matrix<float,5,5> > _track_covars; ///< working array of track covariances
   std::vector<float> _vertex;            ///< working array for collision vertex
-
+  std::vector<std::vector<float> > _vertex_covars;
+  
   // track finding routines                                                                                             
   sPHENIXTracker *_tracker;    // finds full tracks
   sPHENIXTracker* _tracker_vertex; // finds a subset of tracks for initial vertex-finding

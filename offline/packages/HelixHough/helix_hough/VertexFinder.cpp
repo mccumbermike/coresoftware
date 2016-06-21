@@ -36,12 +36,19 @@ VertexFinder::VertexFinder()
 bool VertexFinder::findVertex(vector<SimpleTrack3D>& tracks, vector<float>& vertex, float sigma, bool fix_xy)
 {
   vector<Matrix<float,5,5> > covariances;
-  return findVertex(tracks, covariances, vertex, sigma, fix_xy);
+  vector<vector<float> > vertex_covar;
+  
+  for (unsigned int i = 0; i < 3; ++i) {
+    vertex_covar.push_back(std::vector<float>(3,0.0));
+  }
+  return findVertex(tracks, covariances, vertex, vertex_covar, sigma, fix_xy);
 }
 
 
 
-bool VertexFinder::findVertex(vector<SimpleTrack3D>& tracks, vector<Matrix<float,5,5> >& covariances, vector<float>& vertex, float sigma, bool fix_xy)
+bool VertexFinder::findVertex(vector<SimpleTrack3D>& tracks, vector<Matrix<float,5,5> >& covariances, vector<float>& vertex,
+			      vector<vector<float> >& vertex_covar, float sigma, bool fix_xy)
+			      
 {
   VertexFitFunc _vertexfit;
   FitNewton::NewtonMinimizerGradHessian _minimizer;
@@ -70,15 +77,19 @@ bool VertexFinder::findVertex(vector<SimpleTrack3D>& tracks, vector<Matrix<float
 
   // output storage
   VectorXd min_point = VectorXd::Zero(vertex.size());   // output vector for minimize method below
+  MatrixXd min_point_covar = MatrixXd::Zero(vertex.size(),vertex.size());
 
   // minimize
-  _minimizer.minimize(start_point, min_point, 1.0e-12, 48, 1.0e-18);
+  _minimizer.minimize(start_point, min_point, min_point_covar, 1.0e-12, 48, 1.0e-18);
 
   // store output vertex spatial point
-  for(unsigned i=0; i<vertex.size(); i++)
-    {
-      vertex[i] = min_point(i);
+  for (unsigned i = 0; i < vertex.size(); i++) {
+    vertex[i] = min_point(i);
+
+    for (unsigned j = 0; j < vertex.size(); j++) {
+      vertex_covar[i][j] = min_point_covar(i,j);
     }
+  }
 
   return true;
 }

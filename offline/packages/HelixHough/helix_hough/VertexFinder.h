@@ -25,10 +25,11 @@ class VertexFinder {
 
   bool findVertex(std::vector<SimpleTrack3D>& tracks,
                   std::vector<Eigen::Matrix<float, 5, 5> >& covariances,
-                  std::vector<float>& vertex, float sigma, bool fix_xy = false);
+                  std::vector<float>& vertex, std::vector<std::vector<float> >&vertex_covar, float sigma, bool fix_xy = false);
 
   bool findVertex(std::vector<SimpleTrack3D>& tracks,
-                  std::vector<float>& vertex, float sigma, bool fix_xy = false);
+                  std::vector<float>& vertex, 
+		  float sigma, bool fix_xy = false);
 
  protected:
 };
