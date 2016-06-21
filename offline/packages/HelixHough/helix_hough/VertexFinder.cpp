@@ -80,7 +80,7 @@ bool VertexFinder::findVertex(vector<SimpleTrack3D>& tracks, vector<Matrix<float
   MatrixXd min_point_covar = MatrixXd::Zero(vertex.size(),vertex.size());
 
   // minimize
-  _minimizer.minimize(start_point, min_point, min_point_covar, 1.0e-12, 48, 1.0e-18);
+  _minimizer.minimize(start_point, min_point, min_point_covar, 1.0e-18, 100, 1.0e-24);
 
   // store output vertex spatial point
   for (unsigned i = 0; i < vertex.size(); i++) {

@@ -526,8 +526,9 @@ namespace FitNewton
         break;
       }
     }
-    function->computeCovariance(value, hessian);
 
+    function->calcValGradHessian((*current_point), value, (*current_grad), hessian);
+    
     min_point = (*current_point);
     min_point_covar = hessian.inverse();
 

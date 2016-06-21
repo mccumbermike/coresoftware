@@ -1396,7 +1396,7 @@ int PHG4HoughTransform::full_tracking_and_vertexing() {
     _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.300, false );
     _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.100, false );
     _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.020, false );
-    _vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.005, false );
+    //_vertexFinder.findVertex( _tracks, _track_covars, _vertex, _vertex_covars, 0.005, false );
   
     if (verbosity > 0) {
       cout << " final vertex post-fit: "
