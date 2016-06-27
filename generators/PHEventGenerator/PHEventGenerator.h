@@ -10,7 +10,7 @@ class PHEventGen : public PHEventGenBase {
 public:
 
   PHEventGen(PHEventGenMethod* generator,
-	     PHEventGenTrigger* trigger = new PHEventGenTrigger(),
+	     PHEventGenTrigger* trigger = NULL,
 	     const std::string &name = "PHEVENTGEN");
   virtual ~PHEventGen();
 

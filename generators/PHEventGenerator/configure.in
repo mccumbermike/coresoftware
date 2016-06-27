@@ -1,4 +1,4 @@
-AC_INIT(PHGenEvent,[1.00])
+AC_INIT(PHEventGenerator,[1.00])
 AC_CONFIG_SRCDIR([configure.in])
 AM_INIT_AUTOMAKE
 

@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 lib_LTLIBRARIES = \
-  libPHGenEvent.la 
+  libPHEventGenerator.la 
 
 INCLUDES = \
   -I$(includedir) \
@@ -10,12 +10,12 @@ INCLUDES = \
 
 AM_CXXFLAGS = -Wall -Werror
 
-libPHGenEvent_la_LDFLAGS = \
+libPHEventGenerator_la_LDFLAGS = \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
   `root-config --libs`
 
-libPHGenEvent_la_LIBADD = \
+libPHEventGenerator_la_LIBADD = \
   -lgsl \
   -lgslcblas \
   -lHepMC \
@@ -23,9 +23,10 @@ libPHGenEvent_la_LIBADD = \
   -lfun4all
 
 pkginclude_HEADERS = \
-  PHEventGenMethod.h \
-  PHEventGenTrigger.h \
-  PHEventGenBase.h \
+  PHEventGeneratorMethod.h \
+  PHEventGeneratorTrigger.h \
+  PHEventGeneratorBase.h \
+  PHEventGenerator.h \
   PHGenEvent.h \
   PHGenEvent_v1.h \
   PHGenParticle.h \
@@ -33,13 +34,15 @@ pkginclude_HEADERS = \
   PHGenEventMap.h \
   PHGenEventMap_v1.h
 
-libPHGenEvent_la_SOURCES = \
-  PHEventGenMethod.C \
-  PHEventGenMethod_Dict.C \
-  PHEventGenTrigger.C \
-  PHEventGenTrigger_Dict.C \
-  PHEventGenBase.C \
-  PHEventGenBase_Dict.C \
+libPHEventGenerator_la_SOURCES = \
+  PHEventGeneratorMethod.C \
+  PHEventGeneratorMethod_Dict.C \
+  PHEventGeneratorTrigger.C \
+  PHEventGeneratorTrigger_Dict.C \
+  PHEventGeneratorBase.C \
+  PHEventGeneratorBase_Dict.C \
+  PHEventGenerator.C \
+  PHEventGenerator_Dict.C \
   PHGenEvent.C \
   PHGenEvent_Dict.C \
   PHGenEvent_v1.C \
@@ -72,7 +75,7 @@ BUILT_SOURCES = \
   testexternals.C
 
 testexternals_LDADD = \
-  libPHGenEvent.la
+  libPHEventGenerator.la
 
 testexternals.C:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@
