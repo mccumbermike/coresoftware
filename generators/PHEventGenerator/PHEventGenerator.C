@@ -1,4 +1,4 @@
-#include "PHEventGen.h"
+#include "PHEventGenerator.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/getClass.h>
@@ -6,10 +6,10 @@
 
 using namespace std;
 
-PHEventGen::PHEventGen(PHEventGenMethod* generator,
-		       PHEventGenTrigger* trigger,
-		       const std::string &name): 
-  PHEventGenBase(generator,trigger,name) {}
+PHEventGenerator::PHEventGenerator(PHEventGeneratorMethod* generator,
+				   PHEventGeneratorTrigger* trigger,
+				   const std::string &name): 
+  PHEventGeneratorBase(generator,trigger,name) {}
 
-PHEventGen::~PHEventGen() {}
+PHEventGenerator::~PHEventGenerator() {}
 

@@ -1,10 +1,10 @@
-#include "PHEventGenMethod.h"
+#include "PHEventGeneratorMethod.h"
 
-PHEventGenMethod::PHEventGenMethod(const std::string& name) :
+PHEventGeneratorMethod::PHEventGeneratorMethod(const std::string& name) :
   PHObject(),
   _name(name) {
 }
 
-PHEventGenMethod::~PHEventGenMethod() {
+PHEventGeneratorMethod::~PHEventGeneratorMethod() {
 }
 

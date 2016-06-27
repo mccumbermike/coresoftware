@@ -1,9 +1,9 @@
-#include "PHEventGenTrigger.h"
+#include "PHEventGeneratorTrigger.h"
 
-PHEventGenTrigger::PHEventGenTrigger(const std::string& name) :
+PHEventGeneratorTrigger::PHEventGeneratorTrigger(const std::string& name) :
   PHObject() {
 }
 
-PHEventGenTrigger::~PHEventGenTrigger() {
+PHEventGeneratorTrigger::~PHEventGeneratorTrigger() {
 }
 

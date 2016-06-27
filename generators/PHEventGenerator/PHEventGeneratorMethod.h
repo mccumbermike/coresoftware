@@ -1,5 +1,5 @@
-#ifndef __PHEVENTGENMETHOD_H__
-#define __PHEVENTGENMETHOD_H__
+#ifndef __PHEVENTGENERATORMETHOD_H__
+#define __PHEVENTGENERATORMETHOD_H__
 
 #include "PHGenEvent.h"
 
@@ -7,11 +7,11 @@
 
 #include <phool/PHObject.h>
 
-class PHEventGenMethod : public PHObject {
+class PHEventGeneratorMethod : public PHObject {
   
 public:
   
-  virtual ~PHEventGenMethod();
+  virtual ~PHEventGeneratorMethod();
 
   virtual std::string  get_name() const {return _name;}
   
@@ -22,12 +22,12 @@ public:
   
  protected:
 
-  PHEventGenMethod(const std::string &name = "PHEVENTGENMETHOD");
+  PHEventGeneratorMethod(const std::string &name = "PHEVENTGENMETHOD");
 
  private:
 
   std::string _name;
 };
 
-#endif	/* __PHEVENTGENMETHOD_H__ */
+#endif	/* __PHEVENTGENERATORMETHOD_H__ */
 

@@ -1,5 +1,5 @@
-#ifndef __PHEVENTGENTRIGGER_H__
-#define __PHEVENTGENTRIGGER_H__
+#ifndef __PHEVENTGENERATORTRIGGER_H__
+#define __PHEVENTGENERATORTRIGGER_H__
 
 #include "PHGenEvent.h"
 
@@ -7,12 +7,12 @@
 
 #include <phool/PHObject.h>
 
-class PHEventGenTrigger : public PHObject {
+class PHEventGeneratorTrigger : public PHObject {
   
 public:
 
-  PHEventGenTrigger(const std::string &name = "PHEVENTGENTRIGGER");
-  virtual ~PHEventGenTrigger();
+  PHEventGeneratorTrigger(const std::string &name = "PHEVENTGENTRIGGER");
+  virtual ~PHEventGeneratorTrigger();
 
   virtual bool trigger_event(const PHGenEvent* eventdata) {return true;}
   
@@ -20,5 +20,5 @@ public:
  private:
 };
 
-#endif	/* __PHEVENTGENTRIGGER_H__ */
+#endif	/* __PHEVENTGENERATORTRIGGER_H__ */
 

@@ -1,4 +1,4 @@
-#include "PHEventGenBase.h"
+#include "PHEventGeneratorBase.h"
 
 #include "PHGenEvent.h"
 #include "PHGenEvent_v1.h"
@@ -18,9 +18,9 @@
  
 using namespace std;
 
-PHEventGenBase::PHEventGenBase(PHEventGenMethod* generator,
-			       PHEventGenTrigger* trigger,
-			       const std::string &name): 
+PHEventGeneratorBase::PHEventGeneratorBase(PHEventGeneratorMethod* generator,
+					   PHEventGeneratorTrigger* trigger,
+					   const std::string &name): 
   SubsysReco(name),
   _generator(generator),
   _trigger(trigger),
@@ -40,7 +40,7 @@ PHEventGenBase::PHEventGenBase(PHEventGenMethod* generator,
   _event_map(NULL),
   _rand(NULL) {
 
-  if (!_trigger) _trigger = new PHEventGenTrigger();
+  if (!_trigger) _trigger = new PHEventGeneratorTrigger();
   
   _rand = gsl_rng_alloc(gsl_rng_mt19937);
   _seed = PHRandomSeed(); // fixed seed is handled in this funtcion
@@ -48,14 +48,14 @@ PHEventGenBase::PHEventGenBase(PHEventGenMethod* generator,
   return;
 }
 
-PHEventGenBase::~PHEventGenBase() {
+PHEventGeneratorBase::~PHEventGeneratorBase() {
   if (_generator) delete _generator;
   if (_trigger) delete _trigger;
   if (_rand) gsl_rng_free (_rand);
   return;
 }
 
-int PHEventGenBase::InitRun(PHCompositeNode* topNode) {
+int PHEventGeneratorBase::InitRun(PHCompositeNode* topNode) {
 
   // create nodes...
   PHNodeIterator iter(topNode);
@@ -79,7 +79,7 @@ int PHEventGenBase::InitRun(PHCompositeNode* topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-int PHEventGenBase::process_event(PHCompositeNode* topNode) {
+int PHEventGeneratorBase::process_event(PHCompositeNode* topNode) {
 
   PHGenEvent_v1 event;
   
@@ -101,22 +101,22 @@ int PHEventGenBase::process_event(PHCompositeNode* topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void PHEventGenBase::set_seed(const unsigned int seed) {
+void PHEventGeneratorBase::set_seed(const unsigned int seed) {
   _seed = seed;
   gsl_rng_set(_rand,_seed);
 }
 
-void PHEventGenBase::set_vertex_function(const FUNCTION x,
-					 const FUNCTION y,
-					 const FUNCTION z,
-					 const FUNCTION t) {
+void PHEventGeneratorBase::set_vertex_function(const FUNCTION x,
+					       const FUNCTION y,
+					       const FUNCTION z,
+					       const FUNCTION t) {
   _vertex_func_x = x;
   _vertex_func_y = y;
   _vertex_func_z = z;
   _vertex_func_t = t;
 }
 
-void PHEventGenBase::set_vertex_mean(const double x, const double y,
+void PHEventGeneratorBase::set_vertex_mean(const double x, const double y,
 					   const double z, const double t) {
   _vertex_mean_x = x;
   _vertex_mean_y = y;
@@ -124,7 +124,7 @@ void PHEventGenBase::set_vertex_mean(const double x, const double y,
   _vertex_mean_t = t;
 }
 
-void PHEventGenBase::set_vertex_width(const double x, const double y,
+void PHEventGeneratorBase::set_vertex_width(const double x, const double y,
 					    const double z, const double t) {
   _vertex_width_x = x;
   _vertex_width_y = y;
@@ -132,8 +132,8 @@ void PHEventGenBase::set_vertex_width(const double x, const double y,
   _vertex_width_t = t;
 }
 
-bool PHEventGenBase::generate_vertex(double& x, double& y,
-				     double& z, double& t) {
+bool PHEventGeneratorBase::generate_vertex(double& x, double& y,
+					   double& z, double& t) {
   x = random(_vertex_func_x,_vertex_mean_x,_vertex_width_x);
   y = random(_vertex_func_y,_vertex_mean_y,_vertex_width_y);
   z = random(_vertex_func_z,_vertex_mean_z,_vertex_width_z);
@@ -141,14 +141,14 @@ bool PHEventGenBase::generate_vertex(double& x, double& y,
   return true;
 }
 
-bool PHEventGenBase::shift_vertex(PHGenEvent* event,
-		  const double x, const double y,
-		  const double z, const double t) {
+bool PHEventGeneratorBase::shift_vertex(PHGenEvent* event,
+					const double x, const double y,
+					const double z, const double t) {
   cout << "you need to write me" << endl;
   return true;
 }
 
-double PHEventGenBase::random(const FUNCTION function,
+double PHEventGeneratorBase::random(const FUNCTION function,
 				    const double mean,
 				    const double width) {
   double value = mean;

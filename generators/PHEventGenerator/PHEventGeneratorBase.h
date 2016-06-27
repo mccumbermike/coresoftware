@@ -1,8 +1,8 @@
-#ifndef __PHEVENTGENBASE_H__
-#define __PHEVENTGENBASE_H__
+#ifndef __PHEVENTGENERATORBASE_H__
+#define __PHEVENTGENERATORBASE_H__
 
-#include "PHEventGenMethod.h"
-#include "PHEventGenTrigger.h"
+#include "PHEventGeneratorMethod.h"
+#include "PHEventGeneratorTrigger.h"
 #include "PHGenEvent.h"
 #include "PHGenEventMap.h"
 
@@ -15,11 +15,11 @@
 #include <phool/PHCompositeNode.h>
 #include <fun4all/SubsysReco.h>
 
-class PHEventGenBase : public SubsysReco {
+class PHEventGeneratorBase : public SubsysReco {
   
 public:
   
-  virtual ~PHEventGenBase();
+  virtual ~PHEventGeneratorBase();
 
   virtual int InitRun(PHCompositeNode* topNode);
   virtual int process_event(PHCompositeNode* topNode);
@@ -55,24 +55,24 @@ public:
 
 protected:
 
-  PHEventGenBase(PHEventGenMethod* generator,
-		 PHEventGenTrigger* trigger = NULL,
-		 const std::string &name = "PHEVENTGENBASE");
+  PHEventGeneratorBase(PHEventGeneratorMethod* generator,
+		       PHEventGeneratorTrigger* trigger = NULL,
+		       const std::string &name = "PHEVENTGENBASE");
 
   virtual bool generate_vertex(double& x, double& y, double& z, double& t);
   virtual bool shift_vertex(PHGenEvent* event,
 			    const double x, const double y,
                             const double z, const double t);
 
-  virtual PHEventGenMethod*  get_method() {return _generator;}
-  virtual PHEventGenTrigger* get_trigger() {return _trigger;}
+  virtual PHEventGeneratorMethod*  get_method() {return _generator;}
+  virtual PHEventGeneratorTrigger* get_trigger() {return _trigger;}
   
- private:
+private:
 
   double random(const FUNCTION function, const double mean, const double width);
 
-  PHEventGenMethod*  _generator;
-  PHEventGenTrigger* _trigger;
+  PHEventGeneratorMethod*  _generator;
+  PHEventGeneratorTrigger* _trigger;
   unsigned int _seed;
   FUNCTION _vertex_func_x;
   FUNCTION _vertex_func_y;

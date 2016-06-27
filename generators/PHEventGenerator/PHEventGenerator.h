@@ -1,20 +1,18 @@
-#ifndef __PHEVENTGEN_H__
-#define __PHEVENTGEN_H__
+#ifndef __PHEVENTGENERATOR_H__
+#define __PHEVENTGENERATOR_H__
 
-#include "PHEventGenBase.h"
-#include "PHEventGenMethod.h"
-#include "PHEventGenTrigger.h"
+#include "PHEventGeneratorBase.h"
+#include "PHEventGeneratorMethod.h"
+#include "PHEventGeneratorTrigger.h"
 
-class PHEventGen : public PHEventGenBase {
+class PHEventGenerator : public PHEventGeneratorBase {
+ public:
   
-public:
-
-  PHEventGen(PHEventGenMethod* generator,
-	     PHEventGenTrigger* trigger = NULL,
-	     const std::string &name = "PHEVENTGEN");
-  virtual ~PHEventGen();
+  PHEventGenerator(PHEventGeneratorMethod* generator,
+                   PHEventGeneratorTrigger* trigger = NULL,
+                   const std::string& name = "PHEVENTGEN");
+  virtual ~PHEventGenerator();
 
 };
 
-#endif	/* __PHEVENTGEN_H__ */
-
+#endif /* __PHEVENTGENERATOR_H__ */

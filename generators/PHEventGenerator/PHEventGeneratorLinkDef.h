@@ -1,5 +1,5 @@
 #ifdef __CINT__
 
-#pragma link C++ class PHEventGen-!;
+#pragma link C++ class PHEventGenerator-!;
 
 #endif
