@@ -20,7 +20,7 @@ public:
   
   virtual bool generate_event(PHGenEvent* eventdata) const {return false;}
   
- protected:
+  // protected:
 
   PHEventGeneratorMethod(const std::string &name = "PHEVENTGENMETHOD");
 
