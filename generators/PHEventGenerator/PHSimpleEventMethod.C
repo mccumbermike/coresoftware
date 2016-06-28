@@ -12,6 +12,7 @@ using namespace std;
 
 PHSimpleEventMethod::PHSimpleEventMethod(const string &name): 
   PHEventGeneratorMethod(name),
+  _particle_names(),
   _particle_codes(),
   _vertex_size_func_r(PHEventGeneratorBase::Uniform),
   _vertex_size_mean(0.0),

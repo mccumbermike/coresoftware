@@ -18,7 +18,7 @@ public:
   bool generate_event(PHGenEvent *event);
 
   //! interface for adding particles by name
-  //void add_particles(const std::string &name, const unsigned int count);
+  void add_particles(const std::string &name, const unsigned int count);
 
   //! interface for adding particle by pid
   void add_particles(const int pid, const unsigned int count);
@@ -45,6 +45,7 @@ public:
 
 private:
 
+  std::vector<std::pair<std::string, unsigned int> > _particle_codes; // <name, count>
   std::vector<std::pair<int, unsigned int> > _particle_codes; // <pdgcode, count>
 
   PHEventGeneratorBase::FUNCTION _vertex_size_func_r;
