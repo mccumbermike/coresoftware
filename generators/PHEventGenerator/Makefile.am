@@ -24,6 +24,7 @@ libPHEventGenerator_la_LIBADD = \
 
 pkginclude_HEADERS = \
   PHEventGeneratorMethod.h \
+  PHSimpleEventMethod.h \
   PHEventGeneratorTrigger.h \
   PHEventGeneratorBase.h \
   PHEventGenerator.h \
@@ -37,6 +38,8 @@ pkginclude_HEADERS = \
 libPHEventGenerator_la_SOURCES = \
   PHEventGeneratorMethod.C \
   PHEventGeneratorMethod_Dict.C \
+  PHSimpleEventMethod.C \
+  PHSimpleEventMethod_Dict.C \
   PHEventGeneratorTrigger.C \
   PHEventGeneratorTrigger_Dict.C \
   PHEventGeneratorBase.C \
