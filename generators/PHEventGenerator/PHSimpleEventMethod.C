@@ -6,14 +6,12 @@
 #include <string>
 #include <cassert>
 
-ClassImp(PHSimpleEventMethod)
-
 using namespace std;
 
 PHSimpleEventMethod::PHSimpleEventMethod(const string &name): 
   PHEventGeneratorMethod(name),
-  _particle_names(),
   _particle_codes(),
+  _particle_names(),
   _vertex_size_func_r(PHEventGeneratorBase::Uniform),
   _vertex_size_mean(0.0),
   _vertex_size_width(0.0),
@@ -30,9 +28,8 @@ PHSimpleEventMethod::PHSimpleEventMethod(const string &name):
   return;
   }
 
-void PHSimpleEventMethod::add_particles(const std::string &name, const unsigned int num) {
-  int code = 211;
-  _particle_codes.push_back(std::make_pair(code,num));
+void PHSimpleEventMethod::add_particles(const std::string& name, const unsigned int num) {
+  _particle_names.push_back(std::make_pair(name,num));
   return;
 }
 
@@ -105,59 +102,80 @@ void PHSimpleEventMethod::set_vertex_size_parameters(const double mean, const do
   return;
 }
 
+bool PHSimpleEventMethod::init() {
+
+  if (!PHEventGeneratorMethod::init()) return false;
+  
+  // the definition table should be filled now, so convert codes into names
+  for (unsigned int i=0;i<_particle_codes.size();++i) {
+    int pdgcode = _particle_codes[i].first;
+    unsigned int count = _particle_codes[i].second;
+    string pdgname = PHEventGeneratorMethod::get_pdgname(pdgcode);
+    _particle_names.push_back(make_pair(pdgname,count));
+  }
+  
+  return true;
+}
+
 bool PHSimpleEventMethod::generate_event(PHGenEvent* event) {
 
   event->Reset();
   
-  int vtxindex = -1;
+  int vtxindex = -1; vtxindex*=1;
   int trackid = -1;
-  for (unsigned int i=0; i<_particle_codes.size(); ++i) {
+  for (unsigned int i=0; i<_particle_names.size(); ++i) {
 
-    int pdgcode = _particle_codes[i].first;
+    string pdgname = _particle_names[i].first;
+    int pdgcode = PHEventGeneratorMethod::get_pdgcode(pdgname);
     unsigned int nparticles = _particle_names[i].second;
     
     for (unsigned int j=0; j<nparticles; ++j) {
 
-      
-      
       if ((_vertex_size_width > 0.0)||(_vertex_size_mean != 0.0)) {
 
-	double r = smearvtx(_vertex_size_mean,_vertex_size_width,_vertex_size_func_r);
+	double r = toss(_vertex_size_mean,_vertex_size_width,_vertex_size_func_r);
 
 	double x = 0.0;
 	double y = 0.0;
 	double z = 0.0;
-	gsl_ran_dir_3d(_rand,&x,&y,&z);
+	gsl_ran_dir_3d(PHEventGeneratorMethod::get_rand(),&x,&y,&z);
         x *= r;
         y *= r;
         z *= r;
 
-	vtxindex = _ineve->AddVtx(vtx_x+x,vtx_y+y,vtx_z+z,_t0);
+	//	vtxindex = _ineve->AddVtx(vtx_x+x,vtx_y+y,vtx_z+z,_t0);
       } else if ((i==0)&&(j==0)) {
-	vtxindex = _ineve->AddVtx(vtx_x,vtx_y,vtx_z,_t0);
+	//	vtxindex = _ineve->AddVtx(vtx_x,vtx_y,vtx_z,_t0);
       }
 
       ++trackid;
    
-      double eta = (_eta_max-_eta_min) * gsl_rng_uniform_pos(RandomGenerator) + _eta_min;
-      double phi = (_phi_max-_phi_min) * gsl_rng_uniform_pos(RandomGenerator) + _phi_min;
+      double eta = (_eta_max-_eta_min) * gsl_rng_uniform_pos(PHEventGeneratorMethod::get_rand()) + _eta_min;
+      double phi = (_phi_max-_phi_min) * gsl_rng_uniform_pos(PHEventGeneratorMethod::get_rand()) + _phi_min;
 
       double pt;
-      if (!std::isnan(_p_min) && !std::isnan(_p_max) && !std::isnan(_p_gaus_width)) {
-	pt =  ((_p_max-_p_min) * gsl_rng_uniform_pos(RandomGenerator) + _p_min + gsl_ran_gaussian(RandomGenerator, _p_gaus_width)) / cosh(eta);
-      } else if (!std::isnan(_pt_min) && !std::isnan(_pt_max) && !std::isnan(_pt_gaus_width)) {
-	pt = (_pt_max-_pt_min) * gsl_rng_uniform_pos(RandomGenerator) + _pt_min + gsl_ran_gaussian(RandomGenerator, _pt_gaus_width);
+      if (!std::isnan(_p_min) && !std::isnan(_p_max) &&
+          !std::isnan(_p_gaus_width)) {
+        pt = ((_p_max - _p_min) * gsl_rng_uniform_pos(PHEventGeneratorMethod::get_rand()) +
+              _p_min + gsl_ran_gaussian(PHEventGeneratorMethod::get_rand(), _p_gaus_width)) /
+             cosh(eta);
+      } else if (!std::isnan(_pt_min) && !std::isnan(_pt_max) &&
+                 !std::isnan(_pt_gaus_width)) {
+        pt = (_pt_max - _pt_min) * gsl_rng_uniform_pos(PHEventGeneratorMethod::get_rand()) +
+             _pt_min + gsl_ran_gaussian(PHEventGeneratorMethod::get_rand(), _pt_gaus_width);
       } else {
-	cout << PHWHERE << "Error: neither a p range or pt range was specified" << endl;
-	exit(-1);
+        cout << PHWHERE << "Error: neither a p range or pt range was specified"
+             << endl;
+        exit(-1);
       }
 
       double px = pt*cos(phi);
       double py = pt*sin(phi);
       double pz = pt*sinh(eta);
-      double m = get_mass(pdgcode);
+      double m = PHEventGeneratorMethod::get_mass(pdgcode);
       double e = sqrt(px*px+py*py+pz*pz+m*m);
-
+      e*=1.0;
+      /*
       PHG4Particle *particle = new PHG4Particlev2();
       particle->set_track_id(trackid);
       particle->set_vtx_id(vtxindex);
@@ -171,14 +189,27 @@ bool PHSimpleEventMethod::generate_event(PHGenEvent* event) {
 
       _ineve->AddParticle(vtxindex, particle);
       if (embedflag != 0) _ineve->AddEmbeddedParticle(particle,embedflag);
+      */
     }
   }
 
-  if (verbosity > 0) {
+  if (get_verbosity() > 0) {
     cout << "====================== PHSimpleEventMethod::process_event() =====================" << endl;
-    _ineve->identify();
+    //_ineve->identify();
     cout << "======================================================================================" << endl;
   } 
 
-  return Fun4AllReturnCodes::EVENT_OK;
+  return true;
+}
+
+double PHSimpleEventMethod::toss(const double position,
+				 const double width,
+				 PHEventGeneratorBase::FUNCTION dist) const {
+  double res = position;
+  if (dist == PHEventGeneratorBase::Uniform) {
+    res = (position - width) + 2 * gsl_rng_uniform_pos(PHEventGeneratorMethod::get_rand()) * width;
+  } else if (dist == PHEventGeneratorBase::Gaus) {
+    res = position + gsl_ran_gaussian(PHEventGeneratorMethod::get_rand(), width);
+  }
+  return res;
 }

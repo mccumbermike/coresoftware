@@ -11,13 +11,15 @@ class PHEventGeneratorTrigger : public PHObject {
   
 public:
 
-  PHEventGeneratorTrigger(const std::string &name = "PHEVENTGENTRIGGER");
   virtual ~PHEventGeneratorTrigger();
 
-  virtual bool trigger_event(const PHGenEvent* eventdata) {return true;}
+  virtual bool trigger_event(const PHGenEvent* eventdata) const {return true;}
   
- protected:
- private:
+protected:
+
+  PHEventGeneratorTrigger(const std::string &name = "PHEVENTGENTRIGGER");
+
+private:
 };
 
 #endif	/* __PHEVENTGENERATORTRIGGER_H__ */

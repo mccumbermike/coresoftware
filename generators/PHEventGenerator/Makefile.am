@@ -6,6 +6,7 @@ lib_LTLIBRARIES = \
 INCLUDES = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
+  -I${G4_MAIN}/include/ \
   -I`root-config --incdir` 
 
 AM_CXXFLAGS = -Wall -Werror
@@ -13,7 +14,8 @@ AM_CXXFLAGS = -Wall -Werror
 libPHEventGenerator_la_LDFLAGS = \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
-  `root-config --libs`
+  `root-config --libs` \
+  `geant4-config --libs`
 
 libPHEventGenerator_la_LIBADD = \
   -lgsl \
@@ -26,6 +28,7 @@ pkginclude_HEADERS = \
   PHEventGeneratorMethod.h \
   PHSimpleEventMethod.h \
   PHEventGeneratorTrigger.h \
+  PHPassTrigger.h \
   PHEventGeneratorBase.h \
   PHEventGenerator.h \
   PHGenEvent.h \
@@ -42,6 +45,8 @@ libPHEventGenerator_la_SOURCES = \
   PHSimpleEventMethod_Dict.C \
   PHEventGeneratorTrigger.C \
   PHEventGeneratorTrigger_Dict.C \
+  PHPassTrigger.C \
+  PHPassTrigger_Dict.C \
   PHEventGeneratorBase.C \
   PHEventGeneratorBase_Dict.C \
   PHEventGenerator.C \

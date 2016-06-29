@@ -5,6 +5,8 @@
 #include "PHGenEventMap.h"
 #include "PHGenEventMap_v1.h"
 
+#include "PHPassTrigger.h"
+
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/getClass.h>
 #include <phool/PHCompositeNode.h>
@@ -40,7 +42,7 @@ PHEventGeneratorBase::PHEventGeneratorBase(PHEventGeneratorMethod* generator,
   _event_map(NULL),
   _rand(NULL) {
 
-  if (!_trigger) _trigger = new PHEventGeneratorTrigger();
+  if (!_trigger) _trigger = new PHPassTrigger();
   
   _rand = gsl_rng_alloc(gsl_rng_mt19937);
   _seed = PHRandomSeed(); // fixed seed is handled in this funtcion

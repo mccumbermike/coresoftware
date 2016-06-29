@@ -15,10 +15,11 @@ public:
   PHSimpleEventMethod(const std::string& name = "PHSimpleEventMethod");
   virtual ~PHSimpleEventMethod() {}
 
+  bool init();
   bool generate_event(PHGenEvent *event);
 
   //! interface for adding particles by name
-  void add_particles(const std::string &name, const unsigned int count);
+  void add_particles(const std::string& name, const unsigned int count);
 
   //! interface for adding particle by pid
   void add_particles(const int pid, const unsigned int count);
@@ -45,9 +46,11 @@ public:
 
 private:
 
-  std::vector<std::pair<std::string, unsigned int> > _particle_codes; // <name, count>
+  double toss(const double position, const double width, PHEventGeneratorBase::FUNCTION dist) const;
+  
   std::vector<std::pair<int, unsigned int> > _particle_codes; // <pdgcode, count>
-
+  std::vector<std::pair<std::string, unsigned int> > _particle_names; // <name, count>
+  
   PHEventGeneratorBase::FUNCTION _vertex_size_func_r;
   double _vertex_size_mean;
   double _vertex_size_width;
@@ -61,8 +64,6 @@ private:
   double _p_min;
   double _p_max; 
   double _p_gaus_width;
-
-  ClassDef(PHSimpleEventMethod,1)  
 };
 
 #endif
