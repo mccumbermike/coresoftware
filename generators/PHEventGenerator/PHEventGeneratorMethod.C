@@ -11,7 +11,6 @@
 using namespace std;
 
 PHEventGeneratorMethod::PHEventGeneratorMethod(const std::string& name) :
-  PHObject(),
   _name(name),
   _seed(0),
   _verbosity(0),

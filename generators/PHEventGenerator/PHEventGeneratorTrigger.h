@@ -7,7 +7,7 @@
 
 #include <phool/PHObject.h>
 
-class PHEventGeneratorTrigger : public PHObject {
+class PHEventGeneratorTrigger {
   
 public:
 

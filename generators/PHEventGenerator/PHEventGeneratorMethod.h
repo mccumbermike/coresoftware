@@ -11,7 +11,7 @@
 
 #include <phool/PHObject.h>
 
-class PHEventGeneratorMethod : public PHObject {
+class PHEventGeneratorMethod {
   
 public:
   
