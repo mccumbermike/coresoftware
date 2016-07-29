@@ -17,10 +17,6 @@ pkginclude_HEADERS = \
   Fun4AllHepMCInputManager.h \
   Fun4AllHepMCOutputManager.h \
   Fun4AllOscarInputManager.h \
-  PHGenEvent.h \
-  PHGenEventv1.h \
-  PHGenEventList.h \
-  PHGenEventListv1.h \
   PHHepMCGenEvent.h
 
 libphhepmc_la_LDFLAGS = ${AM_LDFLAGS} `root-config --libs`
@@ -29,14 +25,13 @@ libphhepmc_la_LIBADD = \
   -lSubsysReco \
   -lHepMC \
   -lboost_iostreams \
-  -lfun4all
+  -lfun4all \
+  -lPHEventGenerator
 
 libphhepmc_la_SOURCES = \
   Fun4AllHepMCInputManager.cc \
   Fun4AllHepMCOutputManager.cc \
   Fun4AllOscarInputManager.cc \
-  PHGenEventv1.cc \
-  PHGenEventListv1.cc \
   PHHepMCGenEvent.cc \
   PHHepMC_Dict.cc
 
@@ -61,10 +56,6 @@ PHHepMC_Dict.cc: \
   Fun4AllHepMCOutputManager.h \
   Fun4AllOscarInputManager.h \
   HepMCFlowAfterBurner.h \
-  PHGenEvent.h \
-  PHGenEventv1.h \
-  PHGenEventList.h \
-  PHGenEventListv1.h \
   PHHepMCGenEvent.h \
   $(OFFLINE_MAIN)/include/HepMC/*.h \
   PHHepMCLinkDef.h
