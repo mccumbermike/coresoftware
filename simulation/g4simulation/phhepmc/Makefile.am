@@ -25,8 +25,7 @@ libphhepmc_la_LIBADD = \
   -lSubsysReco \
   -lHepMC \
   -lboost_iostreams \
-  -lfun4all \
-  -lPHEventGenerator
+  -lfun4all
 
 libphhepmc_la_SOURCES = \
   Fun4AllHepMCInputManager.cc \

@@ -1,4 +1,4 @@
-#ifndef __PHSIMPLEEVENTMENTOD_H__
+#ifndef __PHSIMPLEEVENTMETHOD_H__
 #define __PHSIMPLEEVENTMETHOD_H__
 
 #include "PHEventGeneratorMethod.h"

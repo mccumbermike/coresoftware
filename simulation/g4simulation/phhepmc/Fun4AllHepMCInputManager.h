@@ -4,9 +4,6 @@
 #include <fun4all/Fun4AllInputManager.h>
 #include <fun4all/Fun4AllReturnCodes.h>
 
-#include <pheventgenerator/PHEventGeneratorMethod.h>
-#include <pheventgenerator/PHGenEvent.h>
-
 #include <string>
 #include <map>
 #include <fstream>
@@ -21,16 +18,13 @@ namespace HepMC
 
 class PHCompositeNode;
 
-class Fun4AllHepMCInputManager : public Fun4AllInputManager, public PHEventGeneratorMethod
+class Fun4AllHepMCInputManager : public Fun4AllInputManager
 {
  public:
   Fun4AllHepMCInputManager(const std::string &name = "DUMMY",
                            const std::string &nodename = "DST",
                            const std::string &topnodename = "TOP");
   virtual ~Fun4AllHepMCInputManager();
-
-  bool init() {return 0;}
-  bool generate_event(PHGenEvent* event) {return 0;}
   
   int fileopen(const std::string &filenam);
   int fileclose();
