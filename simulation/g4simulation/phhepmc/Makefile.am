@@ -15,6 +15,7 @@ lib_LTLIBRARIES = libphhepmc.la
 
 pkginclude_HEADERS = \
   Fun4AllHepMCInputManager.h \
+  Fun4AllHepMCPileupInputManager.h \
   Fun4AllHepMCOutputManager.h \
   Fun4AllOscarInputManager.h \
   PHGenEvent.h \
@@ -33,6 +34,7 @@ libphhepmc_la_LIBADD = \
 
 libphhepmc_la_SOURCES = \
   Fun4AllHepMCInputManager.cc \
+  Fun4AllHepMCPileupInputManager.cc \
   Fun4AllHepMCOutputManager.cc \
   Fun4AllOscarInputManager.cc \
   PHGenEventv1.cc \
@@ -58,6 +60,7 @@ testexternals.cc:
 
 PHHepMC_Dict.cc: \
   Fun4AllHepMCInputManager.h \
+  Fun4AllHepMCPileupInputManager.h \
   Fun4AllHepMCOutputManager.h \
   Fun4AllOscarInputManager.h \
   HepMCFlowAfterBurner.h \
