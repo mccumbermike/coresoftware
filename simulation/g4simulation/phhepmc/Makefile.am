@@ -30,6 +30,7 @@ libphhepmc_la_LIBADD = \
   -lSubsysReco \
   -lHepMC \
   -lboost_iostreams \
+  -lgsl -lgslcblas \
   -lfun4all
 
 libphhepmc_la_SOURCES = \
