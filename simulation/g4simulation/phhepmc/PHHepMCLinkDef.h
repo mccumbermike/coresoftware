@@ -77,4 +77,9 @@ typedef long size_type;
 #pragma link C++ class Fun4AllOscarInputManager-!;
 #pragma link C++ class PHHepMCGenEvent+;
 
+#pragma link C++ class std::pair<unsigned int,PHHepMCGenEvent*>+;
+#pragma link C++ class std::map<unsigned int,PHHepMCGenEvent*>+;
+
+#pragma link C++ class PHHepMCGenEventMap+;
+
 #endif

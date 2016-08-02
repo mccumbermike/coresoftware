@@ -18,7 +18,8 @@ pkginclude_HEADERS = \
   Fun4AllHepMCPileupInputManager.h \
   Fun4AllHepMCOutputManager.h \
   Fun4AllOscarInputManager.h \
-  PHHepMCGenEvent.h
+  PHHepMCGenEvent.h \
+  PHHepMCGenEventMap.h
 
 libphhepmc_la_LDFLAGS = ${AM_LDFLAGS} `root-config --libs`
 libphhepmc_la_LIBADD = \
@@ -35,6 +36,7 @@ libphhepmc_la_SOURCES = \
   Fun4AllHepMCOutputManager.cc \
   Fun4AllOscarInputManager.cc \
   PHHepMCGenEvent.cc \
+  PHHepMCGenEventMap.cc \
   PHHepMC_Dict.cc
 
 BUILT_SOURCES = \
@@ -60,6 +62,7 @@ PHHepMC_Dict.cc: \
   Fun4AllOscarInputManager.h \
   HepMCFlowAfterBurner.h \
   PHHepMCGenEvent.h \
+  PHHepMCGenEventMap.h \
   $(OFFLINE_MAIN)/include/HepMC/*.h \
   PHHepMCLinkDef.h
 	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $^

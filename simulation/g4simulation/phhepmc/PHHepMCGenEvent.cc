@@ -19,24 +19,49 @@ ClassImp(PHHepMCGenEvent)
 
 using namespace std;
 
-PHHepMCGenEvent::PHHepMCGenEvent(const int theMomentum,const int theDistance):
-  _theEvt(NULL),
-  _isVtxShiftApplied(false),
-  _theMomentumUnit(theMomentum),
-  _theDistanceUnit(theDistance)
-{}
+PHHepMCGenEvent::PHHepMCGenEvent(const int theMomentum,
+				 const int theDistance)
+    : _id(0xFFFFFFFF),
+      _theEvt(NULL),
+      _isVtxShiftApplied(false),
+      _theMomentumUnit(theMomentum),
+      _theDistanceUnit(theDistance) {}
 
-
-PHHepMCGenEvent::~PHHepMCGenEvent()
-{
-  if(_theEvt) delete _theEvt;
+PHHepMCGenEvent::PHHepMCGenEvent(const PHHepMCGenEvent& event) {
+  *this = event;
+  return;
 }
 
+PHHepMCGenEvent& PHHepMCGenEvent::operator=(const PHHepMCGenEvent& event) {
+  _id = event.get_id();
+
+  (*_theEvt) = *(event.getEvent());
+
+  _isVtxShiftApplied = event.is_shift_applied();
+  _theMomentumUnit = event.get_momentumunit();
+  _theDistanceUnit = event.get_lengthunit();
+
+  return *this;
+}
+
+PHHepMCGenEvent::~PHHepMCGenEvent() {
+  if (_theEvt) {
+    delete _theEvt;
+    _theEvt = NULL;
+  }
+}
 
 HepMC::GenEvent* PHHepMCGenEvent::getEvent()
 {
   return _theEvt;
 }
+
+
+const HepMC::GenEvent* PHHepMCGenEvent::getEvent() const
+{
+  return _theEvt;
+}
+
 
 bool PHHepMCGenEvent::addEvent(HepMC::GenEvent *evt)
 {
@@ -102,11 +127,6 @@ int PHHepMCGenEvent::size(void) const
 int PHHepMCGenEvent::vertexSize(void) const
 { 
   return _theEvt->vertices_size();
-}
-
-void PHHepMCGenEvent::Reset()
-{
-  _isVtxShiftApplied = false;
 }
 
 //_____________________________________________________________________________
