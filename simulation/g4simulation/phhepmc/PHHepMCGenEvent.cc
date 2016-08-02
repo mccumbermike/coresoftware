@@ -22,46 +22,58 @@ using namespace std;
 PHHepMCGenEvent::PHHepMCGenEvent(const int theMomentum,
 				 const int theDistance)
     : _id(0xFFFFFFFF),
-      _theEvt(NULL),
       _isVtxShiftApplied(false),
       _theMomentumUnit(theMomentum),
-      _theDistanceUnit(theDistance) {}
+      _theDistanceUnit(theDistance),
+      _theEvt(NULL) {}
 
-PHHepMCGenEvent::PHHepMCGenEvent(const PHHepMCGenEvent& event) {
-  *this = event;
+PHHepMCGenEvent::PHHepMCGenEvent(const PHHepMCGenEvent& event)
+  : _id(event.get_id()),
+    _isVtxShiftApplied(event.is_shift_applied()),
+    _theMomentumUnit(event.get_momentumunit()),
+    _theDistanceUnit(event.get_lengthunit()),
+    _theEvt(NULL) {
+  _theEvt = new HepMC::GenEvent(*event.getEvent());
   return;
 }
 
 PHHepMCGenEvent& PHHepMCGenEvent::operator=(const PHHepMCGenEvent& event) {
+
+  Reset();
+  
   _id = event.get_id();
-
-  (*_theEvt) = *(event.getEvent());
-
   _isVtxShiftApplied = event.is_shift_applied();
   _theMomentumUnit = event.get_momentumunit();
   _theDistanceUnit = event.get_lengthunit();
 
+  const HepMC::GenEvent *hepmc = event.getEvent();
+  _theEvt = new HepMC::GenEvent(*(hepmc));
+  
   return *this;
 }
 
 PHHepMCGenEvent::~PHHepMCGenEvent() {
+  Reset();
+}
+
+void PHHepMCGenEvent::Reset() {
+  _id = 0xFFFFFFFF;
+  _isVtxShiftApplied = false;
+  _theMomentumUnit = HepMC::Units::GEV;
+  _theDistanceUnit = HepMC::Units::CM;
   if (_theEvt) {
     delete _theEvt;
     _theEvt = NULL;
   }
 }
 
-HepMC::GenEvent* PHHepMCGenEvent::getEvent()
-{
+HepMC::GenEvent* PHHepMCGenEvent::getEvent() {
   return _theEvt;
 }
 
-
-const HepMC::GenEvent* PHHepMCGenEvent::getEvent() const
-{
+const HepMC::GenEvent* PHHepMCGenEvent::getEvent() const {
   return _theEvt;
 }
-
 
 bool PHHepMCGenEvent::addEvent(HepMC::GenEvent *evt)
 {

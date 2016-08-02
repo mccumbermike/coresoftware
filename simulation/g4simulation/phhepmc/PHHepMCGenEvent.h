@@ -26,7 +26,7 @@ class PHHepMCGenEvent : public PHObject
   virtual ~PHHepMCGenEvent();
 
   virtual void identify(std::ostream& os=std::cout) const;
-  virtual void Reset() {*this = PHHepMCGenEvent();}
+  virtual void Reset();
   virtual int isValid() const { PHOOL_VIRTUAL_WARNING; return 0; }
   PHHepMCGenEvent* Clone() const {return new PHHepMCGenEvent(*this);}
   
@@ -59,11 +59,11 @@ class PHHepMCGenEvent : public PHObject
 protected:
 
   unsigned int _id;
-  HepMC::GenEvent *_theEvt;
   bool _isVtxShiftApplied;
   int _theMomentumUnit;
   int _theDistanceUnit;
-
+  HepMC::GenEvent *_theEvt;
+  
 private:
   
 

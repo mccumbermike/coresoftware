@@ -7,7 +7,8 @@
 #include <phool/getClass.h>
 
 #include <ffaobjects/RunHeader.h>
-#include <PHHepMCGenEvent.h>
+#include "PHHepMCGenEvent.h"
+#include "PHHepMCGenEventMap.h"
 
 #include <frog/FROG.h>
 #include <phool/PHCompositeNode.h>
@@ -59,6 +60,11 @@ Fun4AllHepMCInputManager::Fun4AllHepMCInputManager(const string &name, const str
   PHHepMCGenEvent *genevent = new PHHepMCGenEvent(momentumunit,lengthunit);
   PHIODataNode<PHObject> *newnode = new  PHIODataNode<PHObject>(genevent,"PHHepMCGenEvent","PHObject");
   dstNode->addNode(newnode);
+
+  PHHepMCGenEventMap *geneventmap = new PHHepMCGenEventMap();
+  PHIODataNode<PHObject> *newmapnode = new PHIODataNode<PHObject>(geneventmap,"PHHepMCGenEventMap","PHObject");
+  dstNode->addNode(newmapnode);
+  
   return ;
 }
 
@@ -171,6 +177,7 @@ Fun4AllHepMCInputManager::run(const int nevents)
   //  cout << "running event " << nevents << endl;
   PHNodeIterator iter(topNode);
   PHHepMCGenEvent *genevent = findNode::getClass<PHHepMCGenEvent>(topNode,"PHHepMCGenEvent");
+  PHHepMCGenEventMap *geneventmap = findNode::getClass<PHHepMCGenEventMap>(topNode,"PHHepMCGenEventMap");
   evt = genevent->getEvent();
   if (save_evt) // if an event was pushed back, copy saved pointer and reset save_evt pointer
     {
@@ -189,6 +196,7 @@ Fun4AllHepMCInputManager::run(const int nevents)
 	}
     }
   genevent->addEvent(evt);
+  geneventmap->insert(genevent);
   if (!evt)
     {
       if (verbosity > 1)
