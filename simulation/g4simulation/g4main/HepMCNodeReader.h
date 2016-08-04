@@ -31,6 +31,11 @@ class HepMCNodeReader : public SubsysReco
 private:
   double smeargauss(const double width);
   double smearflat(const double width);
+
+  int get_pdgcode(const std::string &name) const;
+  std::string get_pdgname(const int pdgcode) const;
+  double get_mass(const int pdgcode) const;
+  
   int _embed_flag;
   double vertex_pos_x;
   double vertex_pos_y;
