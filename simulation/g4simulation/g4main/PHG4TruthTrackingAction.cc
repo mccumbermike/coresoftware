@@ -81,7 +81,10 @@ void PHG4TruthTrackingAction::PreUserTrackingAction( const G4Track* track) {
 
   // create a new vertex object ------------------------------------------------
   G4ThreeVector v = track->GetVertexPosition();
-  map<G4ThreeVector, int>::const_iterator viter = VertexMap.find(v);
+  double vt = track->GetGlobalTime() / ns;
+  G4LorentzVector vector(v[0],v[1],v[2],vt);
+  
+  map<G4LorentzVector, int>::const_iterator viter = VertexMap.find(vector);
   int vtxindex = 0;
   if (viter != VertexMap.end()) {
     vtxindex = viter->second;
@@ -92,11 +95,11 @@ void PHG4TruthTrackingAction::PreUserTrackingAction( const G4Track* track) {
       vtxindex = truthInfoList_->minvtxindex() - 1;
     }
 
-    VertexMap[v] = vtxindex;
+    VertexMap[vector] = vtxindex;
     PHG4VtxPointv1 *vtxpt = new PHG4VtxPointv1(v[0] / cm,
 					       v[1] / cm,
 					       v[2] / cm,
-					       track->GetGlobalTime() / ns);
+					       vt);
     // insert new vertex into the output
     truthInfoList_->AddVertex(vtxindex, vtxpt);
   }

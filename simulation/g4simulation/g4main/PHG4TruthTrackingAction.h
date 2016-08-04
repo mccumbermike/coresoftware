@@ -3,7 +3,7 @@
 
 #include "PHG4TrackingAction.h"
 
-#include <Geant4/G4ThreeVector.hh>
+#include <Geant4/G4LorentzVector.hh>
 
 #include <map>
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-  std::map<G4ThreeVector,int> VertexMap;
+  std::map<G4LorentzVector,int> VertexMap;
 
   //! pointer to the "owning" event action
   PHG4TruthEventAction* eventAction_;
