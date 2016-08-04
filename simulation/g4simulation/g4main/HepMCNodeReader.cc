@@ -236,8 +236,7 @@ int HepMCNodeReader::process_event(PHCompositeNode *topNode) {
     }
   }
   
-  //  if (verbosity > 0)
-    ineve->identify();
+  if (verbosity > 0) ineve->identify();
   
   return Fun4AllReturnCodes::EVENT_OK;
 }
