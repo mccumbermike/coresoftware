@@ -87,8 +87,6 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
     int ncollisions = gsl_ran_poisson(RandomGenerator,_ave_coll_per_crossing);
     if (icrossing == 0) --ncollisions;
 
-    ncollisions = 1;
-    
     for (int icollision = 0; icollision < ncollisions; ++icollision) {
       double t0 = crossing_time;
 

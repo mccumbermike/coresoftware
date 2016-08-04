@@ -24,7 +24,6 @@ class HepMCNodeReader : public SubsysReco
   void Embed(const int i=1) {_embed_flag = i;}
   void VertexPosition(const double v_x, const double v_y, const double v_z);
 
-
   void SmearVertex(const double s_x, const double s_y, const double s_z);
   void SetT0(const double t0) {vertex_t0 = t0;}
 
