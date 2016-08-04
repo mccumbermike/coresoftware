@@ -7,7 +7,8 @@
 #include <phool/getClass.h>
 
 #include <ffaobjects/RunHeader.h>
-#include <PHHepMCGenEvent.h>
+#include "PHHepMCGenEvent.h"
+#include "PHHepMCGenEventMap.h"
 
 #include <frog/FROG.h>
 #include <phool/PHCompositeNode.h>
@@ -32,10 +33,16 @@
 #include <cstdlib>
 #include <memory>
 
+#include <gsl/gsl_const.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
 using namespace std;
+
+// pythia vtx time seems to be in mm/c
+const double mm_over_c_to_sec = 0.1 / GSL_CONST_CGS_SPEED_OF_LIGHT;
+// pythia vtx time seems to be in mm/c
+const double mm_over_c_to_nanosecond = mm_over_c_to_sec * 1e9;
 
 static boost::iostreams::filtering_streambuf<boost::iostreams::input> zinbuffer;
 static const double toMM = 1.e-12;
@@ -64,22 +71,27 @@ Fun4AllHepMCPileupInputManager::~Fun4AllHepMCPileupInputManager() {
 
 int Fun4AllHepMCPileupInputManager::run(const int nevents) {
 
+  static bool first = true;
+  if (first) {    
+    _ave_coll_per_crossing = _collision_rate * _time_between_crossings * 1000.0 * 1e-9;
+    _min_crossing = _min_integration_time / _time_between_crossings;
+    _max_crossing = _max_integration_time / _time_between_crossings;
+    first = false;
+  }
+  
   // toss multiple crossings all the way back
   for (int icrossing = _min_crossing; icrossing <= _max_crossing; ++icrossing) {
-  
+
     double crossing_time = _time_between_crossings * icrossing;
 
     int ncollisions = gsl_ran_poisson(RandomGenerator,_ave_coll_per_crossing);
     if (icrossing == 0) --ncollisions;
 
-    ncollisions = 2;
+    ncollisions = 1;
     
     for (int icollision = 0; icollision < ncollisions; ++icollision) {
       double t0 = crossing_time;
-      t0 *= 1.0;
-      //_generator->set_t0(crossing_time);
-      //_generator->process_event(topNode);
-  
+
     readagain:
 
       if (!isopen) {
@@ -95,24 +107,38 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
           }
         }
       }
-      //  cout << "running event " << nevents << endl;
+
       PHNodeIterator iter(topNode);
       PHHepMCGenEvent *genevent =
 	findNode::getClass<PHHepMCGenEvent>(topNode, "PHHepMCGenEvent");
+      PHHepMCGenEventMap *geneventmap =
+	findNode::getClass<PHHepMCGenEventMap>(topNode, "PHHepMCGenEventMap");
       evt = genevent->getEvent();
-      if (save_evt)  // if an event was pushed back, copy saved pointer and reset
-	// save_evt pointer
-	{
-	  evt = save_evt;
-	  save_evt = NULL;
-	} else {
-	if (readoscar) {
-	  evt = ConvertFromOscar();
-	} else {
-	  evt = ascii_in->read_next_event();
-	}
+      if (save_evt) {  // if an event was pushed back, copy saved pointer and
+                       // reset save_evt pointer
+        evt = save_evt;
+        save_evt = NULL;
+      } else {
+        if (readoscar) {
+          evt = ConvertFromOscar();
+        } else {
+          evt = ascii_in->read_next_event();
+        }
       }
+
+      // modify the time of the event
+      for (HepMC::GenEvent::vertex_iterator v = evt->vertices_begin();
+	   v != evt->vertices_end();
+	   ++v) {
+	HepMC::GenVertex* vertex = (*v);
+	HepMC::FourVector pos(vertex->position());
+	pos.setT(pos.t() + t0 / mm_over_c_to_nanosecond);
+	vertex->set_position(pos);					       
+      }
+
       genevent->addEvent(evt);
+      geneventmap->insert(genevent);
+
       if (!evt) {
 	if (verbosity > 1) {
 	  cout << "error type: " << ascii_in->error_type()
