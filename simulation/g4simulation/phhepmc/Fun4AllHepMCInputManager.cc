@@ -72,14 +72,20 @@ Fun4AllHepMCInputManager::Fun4AllHepMCInputManager(const string &name, const str
   PHNodeIterator iter(topNode);
   PHCompositeNode *dstNode = se->getNode(InputNode.c_str(), topNodeName.c_str());
 
-  PHHepMCGenEvent *genevent = new PHHepMCGenEvent(momentumunit,lengthunit);
-  PHIODataNode<PHObject> *newnode = new  PHIODataNode<PHObject>(genevent,"PHHepMCGenEvent","PHObject");
-  dstNode->addNode(newnode);
+  PHHepMCGenEvent *genevent = findNode::getClass<PHHepMCGenEvent>(topNode,"PHHepMCGenEvent");
+  if (!genevent) {
+    genevent = new PHHepMCGenEvent(momentumunit,lengthunit);
+    PHIODataNode<PHObject> *newnode = new  PHIODataNode<PHObject>(genevent,"PHHepMCGenEvent","PHObject");
+    dstNode->addNode(newnode);
+  }
 
-  PHHepMCGenEventMap *geneventmap = new PHHepMCGenEventMap();
-  PHIODataNode<PHObject> *newmapnode = new PHIODataNode<PHObject>(geneventmap,"PHHepMCGenEventMap","PHObject");
-  dstNode->addNode(newmapnode);
-
+  PHHepMCGenEventMap *geneventmap = findNode::getClass<PHHepMCGenEventMap>(topNode,"PHHepMCGenEventMap");
+  if (!geneventmap) {
+    geneventmap = new PHHepMCGenEventMap();
+    PHIODataNode<PHObject> *newmapnode = new PHIODataNode<PHObject>(geneventmap,"PHHepMCGenEventMap","PHObject");
+    dstNode->addNode(newmapnode);
+  }
+  
   RandomGenerator = gsl_rng_alloc(gsl_rng_mt19937);
   unsigned int seed = PHRandomSeed();  // fixed seed is handled in this funtcion
   gsl_rng_set(RandomGenerator, seed);
@@ -217,6 +223,9 @@ Fun4AllHepMCInputManager::run(const int nevents)
 	}
     }
   genevent->addEvent(evt);
+
+  shift_vertex(genevent);
+  
   geneventmap->insert(genevent);
   if (!evt)
     {
@@ -440,8 +449,6 @@ Fun4AllHepMCInputManager::ConvertFromOscar()
       v->add_particle_out(p);
 
     }
-
-  shift_vertex(evt);
   
   if(verbosity > 3) 
     {
@@ -450,7 +457,7 @@ Fun4AllHepMCInputManager::ConvertFromOscar()
   return evt;
 }
 
-void Fun4AllHepMCInputManager::set_vertex_distribution_function(FUNCTION x, FUNCTION y, FUNCTION z) {
+void Fun4AllHepMCInputManager::set_vertex_distribution_function(VTXFUNC x, VTXFUNC y, VTXFUNC z) {
   _vertex_func_x = x;
   _vertex_func_y = y;
   _vertex_func_z = z;
@@ -471,7 +478,10 @@ void Fun4AllHepMCInputManager::set_vertex_distribution_width(const double x, con
   return;
 }
 
-bool Fun4AllHepMCInputManager::shift_vertex(HepMC::GenEvent* evt) const {
+bool Fun4AllHepMCInputManager::shift_vertex(PHHepMCGenEvent* genevent) const {
+
+  HepMC::GenEvent* evt = genevent->getEvent();
+  if (!evt) return false;
 
   // modify the position of the event
   for (HepMC::GenEvent::vertex_iterator v = evt->vertices_begin();
@@ -480,9 +490,9 @@ bool Fun4AllHepMCInputManager::shift_vertex(HepMC::GenEvent* evt) const {
     HepMC::GenVertex* vertex = (*v);
     HepMC::FourVector pos(vertex->position());
 
-    pos.setX( smear( pos.x(),_vertex_width_x,_vertex_func_x ) );
-    pos.setY( smear( pos.y(),_vertex_width_y,_vertex_func_y ) );
-    pos.setZ( smear( pos.z(),_vertex_width_z,_vertex_func_z ) );
+    pos.setX( smear( pos.x(),_vertex_width_x*10.0,_vertex_func_x ) );
+    pos.setY( smear( pos.y(),_vertex_width_y*10.0,_vertex_func_y ) );
+    pos.setZ( smear( pos.z(),_vertex_width_z*10.0,_vertex_func_z ) );
     
     vertex->set_position(pos);					       
   }
@@ -492,7 +502,7 @@ bool Fun4AllHepMCInputManager::shift_vertex(HepMC::GenEvent* evt) const {
 
 double Fun4AllHepMCInputManager::smear(const double position,
 				       const double width,
-				       FUNCTION dist) const {
+				       VTXFUNC dist) const {
   double res = position;
   if (dist == Uniform) {
     res = (position - width) + 2 * gsl_rng_uniform_pos(RandomGenerator) * width;

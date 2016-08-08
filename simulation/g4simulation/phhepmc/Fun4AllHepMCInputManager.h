@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "PHHepMCGenEvent.h"
+
 #ifndef __CINT__
 #include <gsl/gsl_rng.h>
 #endif
@@ -27,7 +29,7 @@ class Fun4AllHepMCInputManager : public Fun4AllInputManager
  public:
 
   //! supported function distributions
-  enum FUNCTION {Uniform,Gaus};
+  enum VTXFUNC {Uniform,Gaus};
   
   Fun4AllHepMCInputManager(const std::string &name = "DUMMY", const std::string &nodename = "DST", const std::string &topnodename = "TOP");
   virtual ~Fun4AllHepMCInputManager();
@@ -49,7 +51,7 @@ class Fun4AllHepMCInputManager : public Fun4AllInputManager
   HepMC::GenEvent *ConvertFromOscar();
 
   //! toss a new vertex according to a Uniform or Gaus distribution
-  void set_vertex_distribution_function(FUNCTION x, FUNCTION y, FUNCTION z);
+  void set_vertex_distribution_function(VTXFUNC x, VTXFUNC y, VTXFUNC z);
 
   //! set the mean value of the vertex distribution
   void set_vertex_distribution_mean(const double x, const double y, const double z);
@@ -60,8 +62,8 @@ class Fun4AllHepMCInputManager : public Fun4AllInputManager
  protected:
   int OpenNextFile();
   
-  bool shift_vertex(HepMC::GenEvent* event) const;
-  double smear(const double position, const double width, FUNCTION dist) const;
+  bool shift_vertex(PHHepMCGenEvent* event) const;
+  double smear(const double position, const double width, VTXFUNC dist) const;
   
   int isopen;
   int events_total;
@@ -81,9 +83,9 @@ class Fun4AllHepMCInputManager : public Fun4AllInputManager
   std::istream *unzipstream; // feed into HepMc
   std::ifstream theOscarFile;
 
-  FUNCTION _vertex_func_x;
-  FUNCTION _vertex_func_y;
-  FUNCTION _vertex_func_z;
+  VTXFUNC _vertex_func_x;
+  VTXFUNC _vertex_func_y;
+  VTXFUNC _vertex_func_z;
   double _vertex_x;
   double _vertex_y;
   double _vertex_z;

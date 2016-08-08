@@ -34,8 +34,8 @@
 #include <memory>
 
 #include <gsl/gsl_const.h>
-#include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_rng.h>
 
 using namespace std;
 
@@ -58,16 +58,10 @@ Fun4AllHepMCPileupInputManager::Fun4AllHepMCPileupInputManager(
     _min_crossing(0),            // recalculated
     _max_crossing(0) {           // recalculated
 
-  RandomGenerator = gsl_rng_alloc(gsl_rng_mt19937);
-  seed = PHRandomSeed(); // fixed seed is handled in this funtcion
-  gsl_rng_set(RandomGenerator,seed);
-  
   return;
 }
 
-Fun4AllHepMCPileupInputManager::~Fun4AllHepMCPileupInputManager() {
-  gsl_rng_free (RandomGenerator);
-}
+Fun4AllHepMCPileupInputManager::~Fun4AllHepMCPileupInputManager() {}
 
 int Fun4AllHepMCPileupInputManager::run(const int nevents) {
 
@@ -78,7 +72,7 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
     _max_crossing = _max_integration_time / _time_between_crossings;
     first = false;
   }
-  
+
   // toss multiple crossings all the way back
   for (int icrossing = _min_crossing; icrossing <= _max_crossing; ++icrossing) {
 
@@ -124,9 +118,6 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
         }
       }
 
-      // modify the position of the event
-      Fun4AllHepMCInputManager::shift_vertex(evt);
-      
       // modify the time of the event
       for (HepMC::GenEvent::vertex_iterator v = evt->vertices_begin();
 	   v != evt->vertices_end();
@@ -138,6 +129,9 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
       }
 
       genevent->addEvent(evt);
+
+      shift_vertex(genevent);
+      
       geneventmap->insert(genevent);
 
       if (!evt) {

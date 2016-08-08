@@ -10,11 +10,6 @@
 #include <fstream>
 #include <iostream>
 
-// rootcint barfs with this header so we need to hide it
-#ifndef __CINT__
-#include <gsl/gsl_rng.h>
-#endif
-
 // forward declaration of classes in namespace
 namespace HepMC
 {
@@ -52,11 +47,6 @@ class Fun4AllHepMCPileupInputManager : public Fun4AllHepMCInputManager
   double   _ave_coll_per_crossing;
   int      _min_crossing;
   int      _max_crossing;
-  
-  unsigned int seed;
-#ifndef __CINT__
-  gsl_rng *RandomGenerator;
-#endif
 };
 
 #endif /* __FUN4ALLHEPMCINPUTMANAGER_H__ */
