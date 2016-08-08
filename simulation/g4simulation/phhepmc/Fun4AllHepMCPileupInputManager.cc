@@ -124,6 +124,9 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
         }
       }
 
+      // modify the position of the event
+      //shift_vertex(evt);
+      
       // modify the time of the event
       for (HepMC::GenEvent::vertex_iterator v = evt->vertices_begin();
 	   v != evt->vertices_end();

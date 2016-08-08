@@ -331,17 +331,14 @@ int PHG4SimpleEventGenerator::process_event(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-double
-PHG4SimpleEventGenerator::smearvtx(const double position, const double width, FUNCTION dist) const
-{
+double PHG4SimpleEventGenerator::smearvtx(const double position,
+                                          const double width,
+                                          FUNCTION dist) const {
   double res = position;
-  if (dist == Uniform)
-    {
-      res = (position-width) + 2*gsl_rng_uniform_pos(RandomGenerator)*width;
-    }
-  else if (dist == Gaus)
-    {
-      res = position + gsl_ran_gaussian(RandomGenerator,width);
-    }
+  if (dist == Uniform) {
+    res = (position - width) + 2 * gsl_rng_uniform_pos(RandomGenerator) * width;
+  } else if (dist == Gaus) {
+    res = position + gsl_ran_gaussian(RandomGenerator, width);
+  }
   return res;
 }

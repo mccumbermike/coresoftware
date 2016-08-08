@@ -32,6 +32,12 @@
 #include <cstdlib>
 #include <memory>
 
+#include <phool/PHRandomSeed.h>
+
+#include <gsl/gsl_const.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_rng.h>
+
 using namespace std;
 
 static boost::iostreams::filtering_streambuf<boost::iostreams::input> zinbuffer;
@@ -50,7 +56,16 @@ Fun4AllHepMCInputManager::Fun4AllHepMCInputManager(const string &name, const str
   evt(NULL),
   save_evt(NULL),
   filestream(NULL),
-  unzipstream(NULL)
+  unzipstream(NULL),
+  _vertex_func_x(Uniform),
+  _vertex_func_y(Uniform),
+  _vertex_func_z(Uniform),
+  _vertex_x(0.0),
+  _vertex_y(0.0),
+  _vertex_z(0.0),
+  _vertex_width_x(0.0),
+  _vertex_width_y(0.0),
+  _vertex_width_z(0.0)
 {
   Fun4AllServer *se = Fun4AllServer::instance();
   topNode = se->topNode(topNodeName.c_str());
@@ -64,6 +79,10 @@ Fun4AllHepMCInputManager::Fun4AllHepMCInputManager(const string &name, const str
   PHHepMCGenEventMap *geneventmap = new PHHepMCGenEventMap();
   PHIODataNode<PHObject> *newmapnode = new PHIODataNode<PHObject>(geneventmap,"PHHepMCGenEventMap","PHObject");
   dstNode->addNode(newmapnode);
+
+  RandomGenerator = gsl_rng_alloc(gsl_rng_mt19937);
+  unsigned int seed = PHRandomSeed();  // fixed seed is handled in this funtcion
+  gsl_rng_set(RandomGenerator, seed);
   
   return ;
 }
@@ -74,6 +93,8 @@ Fun4AllHepMCInputManager::~Fun4AllHepMCInputManager()
   delete ascii_in;
   delete filestream;
   delete unzipstream;
+
+  gsl_rng_free(RandomGenerator); 
 }
 
 int
@@ -424,5 +445,57 @@ Fun4AllHepMCInputManager::ConvertFromOscar()
       evt->print();
     }
   return evt;
+}
+
+void Fun4AllHepMCInputManager::set_vertex_distribution_function(FUNCTION x, FUNCTION y, FUNCTION z) {
+  _vertex_func_x = x;
+  _vertex_func_y = y;
+  _vertex_func_z = z;
+  return;
+}
+
+void Fun4AllHepMCInputManager::set_vertex_distribution_mean(const double x, const double y, const double z) {
+  _vertex_x = x;
+  _vertex_y = y;
+  _vertex_z = z;
+  return;
+}
+
+void Fun4AllHepMCInputManager::set_vertex_distribution_width(const double x, const double y, const double z) {
+  _vertex_width_x = x;
+  _vertex_width_y = y;
+  _vertex_width_z = z;
+  return;
+}
+
+bool Fun4AllHepMCInputManager::shift_vertex(HepMC::GenEvent* evt) const {
+
+  // modify the position of the event
+  for (HepMC::GenEvent::vertex_iterator v = evt->vertices_begin();
+       v != evt->vertices_end();
+       ++v) {
+    HepMC::GenVertex* vertex = (*v);
+    HepMC::FourVector pos(vertex->position());
+
+    pos.setX( smear( pos.x(),_vertex_width_x,_vertex_func_x ) );
+    pos.setY( smear( pos.y(),_vertex_width_y,_vertex_func_y ) );
+    pos.setZ( smear( pos.z(),_vertex_width_z,_vertex_func_z ) );
+    
+    vertex->set_position(pos);					       
+  }
+
+  return true;
+}
+
+double Fun4AllHepMCInputManager::smear(const double position,
+				       const double width,
+				       FUNCTION dist) const {
+  double res = position;
+  if (dist == Uniform) {
+    res = (position - width) + 2 * gsl_rng_uniform_pos(RandomGenerator) * width;
+  } else if (dist == Gaus) {
+    res = position + gsl_ran_gaussian(RandomGenerator, width);
+  }
+  return res;
 }
 
