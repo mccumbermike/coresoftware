@@ -440,6 +440,9 @@ Fun4AllHepMCInputManager::ConvertFromOscar()
       v->add_particle_out(p);
 
     }
+
+  shift_vertex(evt);
+  
   if(verbosity > 3) 
     {
       evt->print();
