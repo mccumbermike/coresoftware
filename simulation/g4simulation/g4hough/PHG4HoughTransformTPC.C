@@ -1349,7 +1349,7 @@ int PHG4HoughTransformTPC::fast_vertex_from_bbc() {
 	
       _vertex[0] = 0.0;
       _vertex[1] = 0.0;
-      _vertex[2] = vertex->get_z();
+      _vertex[2] = 0.0;//vertex->get_z();
 
       if (verbosity) cout << " initial bbc vertex guess: "
 			  << _vertex[0] << " "
