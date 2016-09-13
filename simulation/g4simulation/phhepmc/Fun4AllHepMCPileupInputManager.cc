@@ -73,6 +73,9 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
     first = false;
   }
 
+  cout << "new event" << endl;
+  cout << "ave per crossing = " << _ave_coll_per_crossing << endl;
+  
   // toss multiple crossings all the way back
   for (int icrossing = _min_crossing; icrossing <= _max_crossing; ++icrossing) {
 
@@ -84,6 +87,8 @@ int Fun4AllHepMCPileupInputManager::run(const int nevents) {
     for (int icollision = 0; icollision < ncollisions; ++icollision) {
       double t0 = crossing_time;
 
+      cout << " pileup t0 = " << t0 << endl;
+      
     readagain:
 
       if (!isopen) {
