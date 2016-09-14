@@ -25,9 +25,9 @@ class EventHeader: public PHObject
   virtual int isValid() const;
 
   /// get Run Number
-  virtual int get_RunNumber() const {return -9999;}
+  int get_RunNumber() const {return -9999;}
   /// set Run Number
-  virtual void set_RunNumber(const int run) {return;}
+  void set_RunNumber(const int run) {return;}
 
   /// get Event Number
   virtual int get_EvtSequence() const {return -9999;}

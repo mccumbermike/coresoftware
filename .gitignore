@@ -82,5 +82,3 @@ tmtags
 *.exe
 *.out
 *.app
-/.cproject
-/.project

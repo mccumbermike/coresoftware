@@ -60,8 +60,6 @@ PHG4SpacalDetector::PHG4SpacalDetector(PHCompositeNode *Node,
 
   fiber_core_step_limits = new G4UserLimits(
       _geom->get_fiber_core_step_size() * cm);
-
-  Verbosity(_geom->get_construction_verbose());
 }
 
 PHG4SpacalDetector::~PHG4SpacalDetector(void)
@@ -144,9 +142,6 @@ PHG4SpacalDetector::Construct(G4LogicalVolume* logicWorld)
 
 
   // install sectors
-  if (_geom->get_sector_map().size() == 0)
-    _geom->init_default_sector_map();
-
   std::pair<G4LogicalVolume *,G4Transform3D> psec = Construct_AzimuthalSeg();
   G4LogicalVolume *sec_logic = psec.first;
   const G4Transform3D & sec_trans = psec.second;
@@ -231,7 +226,7 @@ PHG4SpacalDetector::Construct(G4LogicalVolume* logicWorld)
       //    geo->identify();
     }
 
-  if ((verbosity > 0))
+  if ((verbosity > 0) && (_geom->get_construction_verbose() >= 1))
     {
       cout << "PHG4SpacalDetector::Construct::" << GetName()
           << " - Completed. Print Geometry:" << endl;
@@ -352,7 +347,7 @@ PHG4SpacalDetector::Construct_Fiber(const G4double length, const string & id)
     }
 
     const bool overlapcheck_fiber = overlapcheck
-        and (verbosity >= 3);
+        and (_geom->get_construction_verbose() >= 3);
   G4PVPlacement * core_physi = new G4PVPlacement(0, G4ThreeVector(), core_logic,
       G4String(G4String(GetName() + string("_fiber_core") + id)), fiber_logic,
       false, 0, overlapcheck_fiber);

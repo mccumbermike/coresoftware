@@ -17,22 +17,10 @@ namespace PHGenFit {
 class SpacepointMeasurement : public Measurement
 {
 public:
-	/*!
-	 * Ctor
-	 * \param pos measurement position
-	 * \param resolution standard dev for diagnal elements of the cov, other elements are zero
-	 */
+	//!ctor
 	SpacepointMeasurement(const TVector3& pos, const double resolution);
 
-	/*!
-	 * Ctor
-	 * \param pos measurement position
-	 * \param covariance matrix
-	 */
-	SpacepointMeasurement(const TVector3& pos, const TMatrixDSym& cov);
-
-
-	void init(const TVector3& pos, const TMatrixDSym& cov);
+	void init(const TVector3& pos, const double resolution);
 
 	//!dtor
 	~SpacepointMeasurement();
